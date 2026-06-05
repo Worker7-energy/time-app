@@ -1,15 +1,9 @@
-import pytest
-from app import app
+def test_get_metrics(client):
+    # Сначала делаем запрос к /time, чтобы увеличить счётчик
+    client.get('/time')
 
-@pytest.fixture
-def client():
-    app.config['TESTING'] = True
-    with app.test_client() as client:
-        yield client
-
-def test_get_time(client):
-    response = client.get('/time')
+    response = client.get('/metrics')
     assert response.status_code == 200
     data = response.get_json()
-    assert 'time' in data
-    assert data['time'] != 0
+    assert 'count' in data
+    assert data['count'] >= 1
